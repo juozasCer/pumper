@@ -100,7 +100,7 @@ function Scene() {
             </button>
             <p>Contact Address</p>
             <div className="ass">
-            <a href="https://x.com/memsec_" target="_blank">
+            <a href="https://x.com/pumpfun3d" target="_blank">
               <img src="/media/x.svg" alt="X.com" />
             </a>
           </div>
@@ -115,7 +115,7 @@ function Scene() {
             <p>Paused. Click to resume.</p>
             <p>Contact Address</p>
              <div className="ass">
-            <a href="https://x.com/memsec_" target="_blank">
+            <a href="https://x.com/pumpfun3d" target="_blank">
               <img src="/media/x.svg" alt="X.com" />
             </a>
           </div>
