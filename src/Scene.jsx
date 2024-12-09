@@ -98,7 +98,7 @@ function Scene() {
             <button onClick={handleStartGame} className="start-button">
               Start
             </button>
-            <p>Contact Address</p>
+            <p>DRMpcnSDvewqF4phhDUkDwrGZYzMfYv5BZ7BtS9qpump</p>
             <div className="ass">
             <a href="https://x.com/pumpfun3d" target="_blank">
               <img src="/media/x.svg" alt="X.com" />
@@ -113,7 +113,7 @@ function Scene() {
         <div className="blur-overlay" onClick={handleBlurOverlayClick}>
           <div className="blur-overlay-content">
             <p>Paused. Click to resume.</p>
-            <p>Contact Address</p>
+            <p>DRMpcnSDvewqF4phhDUkDwrGZYzMfYv5BZ7BtS9qpump</p>
              <div className="ass">
             <a href="https://x.com/pumpfun3d" target="_blank">
               <img src="/media/x.svg" alt="X.com" />
