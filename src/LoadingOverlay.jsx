@@ -11,7 +11,6 @@ const LoadingOverlay = () => {
     <Html center>
       <div className="loading-overlay">
         <div className="loading-content">
-          <p>Loading {progress.toFixed(0)}%</p>
           <div className="spinner"></div>
         </div>
       </div>
