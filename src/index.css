@@ -1,3 +1,8 @@
+@font-face {
+  font-family: customFont;
+  src: url("/fonts/Letterblocks-aoA5.ttf");
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -18,72 +23,42 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
+  font-family: "customFont";
 }
-/* Ensure that the canvas fills the viewport */
-.game-canvas {
+/* Overlay.css */
+
+.scene-container {
+  position: relative;
   width: 100%;
   height: 100vh;
-  display: block;
+  overflow: hidden;
 }
 
-/* Start Game Overlay Styles */
-.start-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10; /* Higher than Canvas */
-}
-
-.start-overlay-content {
-  text-align: center;
-  color: #ffffff;
-}
-
-.text{
-  font-weight: bold;
-  font-size: 24px;
-}
-
-.start-button {
-  padding: 10px 20px;
-  font-size: 1.2rem;
-  border-radius: 50px;
-  background-color: #00000000;
-  /* margin-top: 20px; */
-  cursor: pointer;
-  color:white;
-  margin: 10px;
-}
-.start-button:hover{
-opacity: 0.5;
-}
-
-/* Blur Overlay Styles */
 .blur-overlay {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  backdrop-filter: blur(5px); /* Apply blur effect */
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent background */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10; /* Higher than Canvas */
-  cursor: pointer;
+  /* cursor: pointer; */
+  z-index: 0; /* Ensure it's on top of the canvas */
+  /* background-image: url(/media/leaf.svg) ; */
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
-.blur-overlay-content {
-  text-align: center;
-  color: #ffffff;
-  font-size: 1.5rem;
+.overlay-content {
+  color: white;
+    font-size: 2rem;
+    text-align: center;
+    /* pointer-events: none; */
+    position: relative;
+    bottom: 150px;
 }
 
 .ass {
@@ -99,4 +74,103 @@ img {
 }
 img:hover{
 opacity: 0.5;
+}
+
+
+/* Style for the Contact Address Div */
+.copy-div {
+  position: absolute;
+  /* bottom: 20px; */
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.288);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 1;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: opacity 0.3s ease;
+}
+
+/* Hover Effect for the Contact Address Div */
+.copy-div:hover {
+  opacity: 0.5;
+}
+
+/* Style for the Copy Success Message */
+.copy-success {
+  font-size: 0.8em;
+  color: #4caf50;
+}
+
+/* src/components/LoadingOverlay.css */
+
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background-image: url(/media/LOADIMAGE.jpg);
+  width: 100vw;
+  height: 100vh;
+}
+
+.loading-content {
+  /* background: rgba(0, 0, 0, 1); */
+  padding: 2rem 3rem;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.spinner {
+  margin-top: 1rem;
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Spinner Animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.busik1 {
+  background-image: url('/media/pu.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  width: 500px;
+  height: 500px;
+  /* transition: transform 0.3s ease-in-out; */
+  display: flex;
+  /* animation: tiltAnimation 0.8s infinite alternate ease-in-out; */
+}
+.buslog {
+  display: flex;
+  animation: tiltAnimation 0.8s infinite alternate ease-in-out;
+  transition: transform 0.3s ease-in-out;
+  top: 100px;
+  position: relative;
+  z-index: 1;
+}
+
+.log {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  font-size: 200px;
+  color: #ffffff;
+  -webkit-text-stroke: 4px #ffffff;
+
 }

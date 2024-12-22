@@ -1,158 +1,134 @@
 // src/components/Scene.jsx
 
-import React, { useEffect, useState, useRef } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Plane } from '@react-three/drei';
-import * as THREE from 'three';
-import Controls from './Controls'; // Import the Controls component
-import Environment from './Environment'; // Import the Environment component
-// import './Scene.css'; // Import the CSS for styling
+import React, { useState, Suspense } from 'react'
+import { Canvas } from '@react-three/fiber'
+import { Environment, } from '@react-three/drei'
+import Controls from './Controls'
+import * as THREE from 'three'
+import LoadingOverlay from './LoadingOverlay'
+import VideoFloor from './VideoFloor'; // Import the new VideoFloor component
 
-function Scene() {
-  const [videoTexture, setVideoTexture] = useState(null);
-  const [isGameStarted, setIsGameStarted] = useState(false);
-  const [isPointerLocked, setIsPointerLocked] = useState(false);
-  const canvasRef = useRef();
+const Scene = () => {
+  const [pointerLocked, setPointerLocked] = useState(false)
+  const [copySuccess, setCopySuccess] = useState('') // State to manage copy success message
+  const CONTACT_ADDRESS = 'Loading...'
+  const handleLock = () => {
+    setPointerLocked(true)
+  }
 
-  // Set up the video texture
-  useEffect(() => {
-    const video = document.createElement('video');
-    video.src = '/media/PUMPFUN3D.mp4'; // Path to the MP4 file in the public folder
-    video.crossOrigin = 'Anonymous'; // Ensure cross-origin if needed
-    video.load();
-    video.muted = true;
-    video.loop = true;
+  const handleUnlock = () => {
+    setPointerLocked(false)
+  }
 
-    // Attempt to play the video
-    const playPromise = video.play();
-    if (playPromise !== undefined) {
-      playPromise.catch((error) => {
-        console.error('Error playing video:', error);
-      });
+  const handleOverlayClick = () => {
+    // Exit pointer lock when overlay is clicked
+    document.exitPointerLock()
+    setPointerLocked(false)
+  }
+
+  const handleCopy = async () => {
+    try {
+
+      await navigator.clipboard.writeText(CONTACT_ADDRESS)
+      setCopySuccess('Copied!')
+      // Clear the success message after 2 seconds
+      setTimeout(() => {
+        setCopySuccess('')
+      }, 2000)
+    } catch (err) {
+      console.error('Failed to copy!', err)
+      setCopySuccess('Failed to copy!')
+      // Clear the error message after 2 seconds
+      setTimeout(() => {
+        setCopySuccess('')
+      }, 2000)
     }
-
-    const texture = new THREE.VideoTexture(video);
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    texture.format = THREE.RGBFormat;
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(1080 / 16, 1824 / 16);
-
-    setVideoTexture(texture);
-
-    // Cleanup on unmount
-    return () => {
-      video.pause();
-      video.src = '';
-    };
-  }, []);
-
-  // Handle pointer lock changes
-  useEffect(() => {
-    const handlePointerLockChange = () => {
-      const lockedElement = document.pointerLockElement;
-      setIsPointerLocked(lockedElement === canvasRef.current);
-    };
-
-    document.addEventListener('pointerlockchange', handlePointerLockChange);
-    document.addEventListener('pointerlockerror', handlePointerLockChange);
-
-    return () => {
-      document.removeEventListener('pointerlockchange', handlePointerLockChange);
-      document.removeEventListener('pointerlockerror', handlePointerLockChange);
-    };
-  }, []);
-
-  const handleStartGame = (e) => {
-    e.stopPropagation(); // Prevent the click from propagating to the Canvas
-    setIsGameStarted(true);
-    // Request pointer lock on the Canvas element
-    if (canvasRef.current) {
-      canvasRef.current.requestPointerLock();
-    }
-  };
-
-  const handleCanvasClick = () => {
-    // Only request pointer lock if the game is already started
-    if (isGameStarted && !isPointerLocked && canvasRef.current) {
-      canvasRef.current.requestPointerLock();
-    }
-  };
-
-  const handleBlurOverlayClick = (e) => {
-    e.stopPropagation(); // Prevent the click from propagating to the Canvas
-    setIsGameStarted(true); // Optionally resume the game
-    if (canvasRef.current) {
-      canvasRef.current.requestPointerLock();
-    }
-  };
+  }
 
   return (
-    <>
-      {/* Start Game Overlay */}
-      {!isGameStarted && (
-        <div className="start-overlay" onClick={(e) => e.stopPropagation()}>
-          <div className="start-overlay-content">
-            <div className='text'>PUMPFUN 3D</div>
-            <button onClick={handleStartGame} className="start-button">
-              Start
-            </button>
-            <p>DRMpcnSDvewqF4phhDUkDwrGZYzMfYv5BZ7BtS9qpump</p>
-            <div className="ass">
-            <a href="https://x.com/pumpfun3d" target="_blank">
-              <img src="/media/x.svg" alt="X.com" />
-            </a>
-          </div>
-          </div>
-        </div>
-      )}
-
-      {/* Blur Overlay when Pointer is not locked */}
-      {isGameStarted && !isPointerLocked && (
-        <div className="blur-overlay" onClick={handleBlurOverlayClick}>
-          <div className="blur-overlay-content">
-            <p>Paused. Click to resume.</p>
-            <p>DRMpcnSDvewqF4phhDUkDwrGZYzMfYv5BZ7BtS9qpump</p>
-             <div className="ass">
-            <a href="https://x.com/pumpfun3d" target="_blank">
-              <img src="/media/x.svg" alt="X.com" />
-            </a>
-          </div>
-          </div>
-         
-        </div>
-      )}
-
+    <div className="scene-container">
       <Canvas
-        ref={canvasRef}
-        className="game-canvas"
-        camera={{ position: [0, 1.6, 0], fov: 80, near: 0.01, far: 1000 }}
+        style={{ width: '100%', height: '100vh' }}
+        camera={{ position: [0, 1.6, 0], fov: 80, near: 0.01, far: 150 }}
         onCreated={({ camera, gl }) => {
-          camera.lookAt(0, 1.6, -1); // Adjusted to look forward along the Z-axis
-          gl.setClearColor(0x000000); // Sets the background color to black for better contrast
+          camera.lookAt(0, 1.6, 0) // Makes the camera look forward along the Z-axis
+          gl.setClearColor(0x000000)
+          gl.shadowMap.enabled = true // Enable shadows globally
+          gl.shadowMap.type = THREE.PCFSoftShadowMap // Use soft shadows for better quality
         }}
-        onClick={handleCanvasClick}
       >
-        {/* Add the Environment component here */}
-        <Environment />
+        <Suspense fallback={<LoadingOverlay />}>
+          {/* <ambientLight intensity={0.1} /> */}
+          <directionalLight
+            position={[100, 100, 100]}
+            intensity={5}
+            castShadow
+            color={"#000000"}
+            shadow-mapSize-width={2048} // Increase for higher quality shadows
+            shadow-mapSize-height={2048}
+            shadow-camera-left={-50}
+            shadow-camera-right={50}
+            shadow-camera-top={50}
+            shadow-camera-bottom={-50}
+            shadow-camera-near={1}
+            shadow-camera-far={200}
+            shadow-bias={-0.005}
+          />
+          <VideoFloor/>
+          {/* Environment preset for realistic lighting */}
+          <Environment
+            files="/media/kloppenheim_02_puresky_4k.hdr" // Replace with your HDRI file path
+            background // Use the HDRI as the background
+            backgroundBlurriness={0}
+            backgroundIntensity={1}
+            environmentIntensity={0.5}
+          />
 
-        {/* Lights */}
-        {/* <ambientLight intensity={0.5} /> */}
-        {/* <directionalLight position={[10, 10, 5]} intensity={1} /> */}
-
-        {/* Video Texture Plane */}
-        {videoTexture && (
-          <Plane args={[1000, 1000]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-            <meshBasicMaterial map={videoTexture} />
-          </Plane>
-        )}
-
-        {/* Controls */}
-        <Controls disabled={!isPointerLocked || !isGameStarted} />
+          {/* FPS-style camera controls */}
+          <Controls onLock={handleLock} onUnlock={handleUnlock} />
+        </Suspense>
       </Canvas>
-    </>
-  );
+
+      {/* Blur Overlay */}
+      {!pointerLocked && (
+        <div className="blur-overlay" onClick={handleOverlayClick}>
+          <div className="overlay-content">
+            <div className='buslog'>
+              <div className='busik1'></div><div className='log'>PUMPFUN 3D</div>
+            </div>
+            <p>click to move</p>
+            <div className="ass">
+              <a
+                href="https://x.com/memzoo_project"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()} // Prevent overlay click
+              >
+                <img src="/media/x.svg" alt="X.com" />
+              </a>
+            </div>
+            <div
+              onClick={(e) => {
+                e.stopPropagation() // Prevent overlay click
+                handleCopy()
+              }}
+              className="copy-div"
+              title="Click to copy contact address"
+              style={{ cursor: 'pointer', marginTop: '1rem', color: 'white' }} // Optional styling
+            >
+              <span>{CONTACT_ADDRESS}</span>
+              {/* Display the copy success message */}
+              {copySuccess && (
+                <span className="copy-success" style={{ marginLeft: '0.5rem', color: 'lightgreen' }}>
+                  {copySuccess}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }
 
-export default Scene;
+export default Scene

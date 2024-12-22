@@ -1,103 +1,100 @@
 // Controls.jsx
-import React, { useEffect, useRef, useState } from 'react';
-import { PointerLockControls } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
+import React, { useRef, useState, useEffect } from 'react'
+import { PointerLockControls } from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
+import * as THREE from 'three'
 
-function Controls({ disabled }) {
-  const controlsRef = useRef();
-  const [move, setMove] = useState({
+const Controls = ({ onLock, onUnlock }) => {
+  const controlsRef = useRef()
+  const velocity = useRef(new THREE.Vector3())
+  const direction = useRef(new THREE.Vector3())
+  const [keys, setKeys] = useState({
     forward: false,
     backward: false,
     left: false,
     right: false,
-  });
-  const velocity = useRef(new THREE.Vector3());
-  const direction = useRef(new THREE.Vector3());
+  })
 
-  // Handle keyboard input
   useEffect(() => {
-    if (disabled) {
-      // Reset movement when disabled
-      setMove({
-        forward: false,
-        backward: false,
-        left: false,
-        right: false,
-      });
-      return;
+    const handleKeyDown = (event) => {
+      switch (event.code) {
+        case 'KeyW':
+          setKeys((prev) => ({ ...prev, forward: true }))
+          break
+        case 'KeyA':
+          setKeys((prev) => ({ ...prev, left: true }))
+          break
+        case 'KeyS':
+          setKeys((prev) => ({ ...prev, backward: true }))
+          break
+        case 'KeyD':
+          setKeys((prev) => ({ ...prev, right: true }))
+          break
+        default:
+          break
+      }
     }
 
-    const onKeyDown = (event) => {
+    const handleKeyUp = (event) => {
       switch (event.code) {
         case 'KeyW':
-          setMove((prev) => ({ ...prev, forward: true }));
-          break;
+          setKeys((prev) => ({ ...prev, forward: false }))
+          break
         case 'KeyA':
-          setMove((prev) => ({ ...prev, left: true }));
-          break;
+          setKeys((prev) => ({ ...prev, left: false }))
+          break
         case 'KeyS':
-          setMove((prev) => ({ ...prev, backward: true }));
-          break;
+          setKeys((prev) => ({ ...prev, backward: false }))
+          break
         case 'KeyD':
-          setMove((prev) => ({ ...prev, right: true }));
-          break;
+          setKeys((prev) => ({ ...prev, right: false }))
+          break
         default:
-          break;
+          break
       }
-    };
+    }
 
-    const onKeyUp = (event) => {
-      switch (event.code) {
-        case 'KeyW':
-          setMove((prev) => ({ ...prev, forward: false }));
-          break;
-        case 'KeyA':
-          setMove((prev) => ({ ...prev, left: false }));
-          break;
-        case 'KeyS':
-          setMove((prev) => ({ ...prev, backward: false }));
-          break;
-        case 'KeyD':
-          setMove((prev) => ({ ...prev, right: false }));
-          break;
-        default:
-          break;
-      }
-    };
-
-    document.addEventListener('keydown', onKeyDown);
-    document.addEventListener('keyup', onKeyUp);
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('keyup', handleKeyUp)
 
     return () => {
-      document.removeEventListener('keydown', onKeyDown);
-      document.removeEventListener('keyup', onKeyUp);
-    };
-  }, [disabled]);
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [])
 
-  // Handle movement in the animation loop
   useFrame((_, delta) => {
-    if (!controlsRef.current || !controlsRef.current.isLocked || disabled) return;
+    if (!controlsRef.current || !controlsRef.current.isLocked) return
 
-    const speed = 50;
-    velocity.current.x -= velocity.current.x * 10.0 * delta;
-    velocity.current.z -= velocity.current.z * 10.0 * delta;
+    const speed = 50
+    velocity.current.x -= velocity.current.x * 10.0 * delta
+    velocity.current.z -= velocity.current.z * 10.0 * delta
 
-    direction.current.z = Number(move.forward) - Number(move.backward);
-    direction.current.x = Number(move.right) - Number(move.left);
-    direction.current.normalize();
+    direction.current.z = Number(keys.forward) - Number(keys.backward)
+    direction.current.x = Number(keys.right) - Number(keys.left)
+    direction.current.normalize()
 
-    if (move.forward || move.backward)
-      velocity.current.z -= direction.current.z * speed * delta;
-    if (move.left || move.right)
-      velocity.current.x -= direction.current.x * speed * delta;
+    if (keys.forward || keys.backward)
+      velocity.current.z -= direction.current.z * speed * delta
+    if (keys.left || keys.right)
+      velocity.current.x -= direction.current.x * speed * delta
 
-    // Move the camera based on velocity
-    controlsRef.current.moveRight(-velocity.current.x * delta);
-    controlsRef.current.moveForward(-velocity.current.z * delta);
-  });
+    controlsRef.current.moveRight(-velocity.current.x * delta)
+    controlsRef.current.moveForward(-velocity.current.z * delta)
 
-  return <PointerLockControls ref={controlsRef} />;
+    // // Clamp the camera position within the defined boundaries
+    // const camera = controlsRef.current.getObject() // Access the camera
+    // // camera.position.x = THREE.MathUtils.clamp(camera.position.x, -2.5, 2.5)
+    // // camera.position.z = THREE.MathUtils.clamp(camera.position.z, -25, 2)
+  })
+
+  return (
+    <PointerLockControls
+      ref={controlsRef}
+      onLock={onLock}
+      onUnlock={onUnlock}
+    />
+  )
 }
 
-export default Controls;
+export default Controls
