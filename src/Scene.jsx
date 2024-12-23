@@ -11,7 +11,7 @@ import VideoFloor from './VideoFloor'; // Import the new VideoFloor component
 const Scene = () => {
   const [pointerLocked, setPointerLocked] = useState(false)
   const [copySuccess, setCopySuccess] = useState('') // State to manage copy success message
-  const CONTACT_ADDRESS = 'Loading...'
+  const CONTACT_ADDRESS = '7KHP55zjQ2pqpXKbizPbMLafjNfywZh6GbKfzFZWpump'
   const handleLock = () => {
     setPointerLocked(true)
   }
