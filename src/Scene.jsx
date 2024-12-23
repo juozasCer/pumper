@@ -97,16 +97,6 @@ const Scene = () => {
               <div className='busik1'></div><div className='log'>PUMPFUN 3D</div>
             </div>
             <p>click to move</p>
-            <div className="ass">
-              <a
-                href="https://x.com/memzoo_project"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()} // Prevent overlay click
-              >
-                <img src="/media/x.svg" alt="X.com" />
-              </a>
-            </div>
             <div
               onClick={(e) => {
                 e.stopPropagation() // Prevent overlay click
